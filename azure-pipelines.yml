@@ -1,0 +1,24 @@
+trigger:
+  branches:
+    include:
+      - main  # This will trigger the pipeline on pushes to the main branch
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - task: Docker@2
+    displayName: 'Build Docker Image'
+    inputs:
+      command: 'build'
+      repository: 'docker-app'  # Replace with your repo name
+      Dockerfile: '**/Dockerfile'
+      tags: '$(Build.BuildId)'
+
+  - task: Docker@2
+    displayName: 'Push Docker Image'
+    inputs:
+      command: 'push'
+      repository: 'docker-app'
+      tags: '$(Build.BuildId)'
+      containerRegistry: 'DockerHubConnection'
