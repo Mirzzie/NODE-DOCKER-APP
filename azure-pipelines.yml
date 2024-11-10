@@ -7,8 +7,11 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  imageName: 'mirzzie/docker-app'  # Docker Hub image repo
-  containerName: 'sampleapp'       # Name of the running container on AWS
+  imageName: 'mirzzie/docker-app'      # Docker Hub repository
+  containerName: 'sampleapp'           # Name of the Docker container on AWS
+  serverUser: 'ubuntu'                 # SSH username for AWS server
+  serverIp: $(AWS)       # AWS server IP address
+  privateKey: $(Key)         # Private key for SSH authentication (stored securely in pipeline variables)
 
 stages:
   - stage: Build
@@ -35,18 +38,18 @@ stages:
     jobs:
       - job: Deploy
         steps:
-          - task: UseSSH@0
-            inputs:
-              sshEndpoint: 'aws'  # Replace with your SSH service connection name
-              runOptions: 'inline'
-              inline: |
-                # Stop the running container if it exists
+          - script: |
+              echo "Deploying to AWS Server..."
+              # Create SSH key file
+              echo "$(privateKey)" > ~/.ssh/aws_key
+              chmod 600 ~/.ssh/aws_key
+
+              # SSH into the server and pull the latest Docker image, then restart container
+              ssh -i ~/.ssh/aws_key $(serverUser)@$(serverIp) << 'EOF'
                 docker stop $(containerName) || true
                 docker rm $(containerName) || true
-
-                # Pull the latest image from Docker Hub
                 docker pull $(imageName):$(Build.BuildId)
-
-                # Run the new container with the latest image
                 docker run -d --name $(containerName) -p 80:80 $(imageName):$(Build.BuildId)
+              EOF
+            displayName: 'Deploy Docker Container to AWS'
 
