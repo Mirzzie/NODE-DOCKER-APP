@@ -11,7 +11,6 @@ variables:
   containerName: 'sampleapp'
   DeployUser: $(user)
   DeployServerIP: $(ip)
-  privateKey: $(key)
 
 stages:
   - stage: Build
@@ -41,30 +40,27 @@ stages:
     jobs:
       - job: Deploy
         steps:
-         - script: |
-            echo "Deploying to AWS Docker Application Server..."
+          - task: DownloadSecureFile@1
+            inputs:
+              secureFile: 'KEY.pem'  # Name of your uploaded secure file
+            name: privateKey
 
-             # Create directory for the SSH key if not already present
-            mkdir -p ~/key
+          - script: |
+              echo "Deploying to AWS Docker Application Server..."
 
-             # Write the private key to key.pem and confirm content
-            echo "$privateKey" > ~/key/key.pem
-            chmod 600 ~/key/key.pem
+               # Set up SSH key from downloaded secure file
+              mkdir -p ~/.ssh
+              cp $(privateKey.secureFilePath) ~/.ssh/id_rsa
+              chmod 600 ~/.ssh/id_rsa
 
-             # Output the first few lines of the key to verify it was saved
-            head -n 5 ~/key/key.pem
+               # Add Docker server's host key to known_hosts
+              ssh-keyscan -H "$(DeployServerIP)" >> ~/.ssh/known_hosts
 
-             # Add Docker server's host key to known_hosts
-            ssh-keyscan -H "$(DeployServerIP)" >> ~/.ssh/known_hosts
-
-             # Deploy Docker container on AWS
-            ssh -i ~/key/key.pem "$(DeployUser)"@"$(DeployServerIP)" << EOF
-              docker stop $(containerName) || true
-              docker rm $(containerName) || true
-              docker pull $(imageName):$(Build.BuildId)
-              docker run -d --name $(containerName) -p 80:80 $(imageName):$(Build.BuildId)
-            EOF
-           displayName: 'Deploy Docker Container to AWS Docker Application EC2'
-
-
-
+               # Deploy Docker container on AWS
+              ssh -i ~/.ssh/id_rsa "$(DeployUser)"@"$(DeployServerIP)" << EOF
+                docker stop $(containerName) || true
+                docker rm $(containerName) || true
+                docker pull $(imageName):$(Build.BuildId)
+                docker run -d --name $(containerName) -p 80:80 $(imageName):$(Build.BuildId)
+              EOF
+            displayName: 'Deploy Docker Container to AWS Docker Application EC2'
