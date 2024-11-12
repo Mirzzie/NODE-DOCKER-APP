@@ -7,11 +7,12 @@ pool:
   name: 'Docker-App'
 
 variables:
-  imageName: 'mirzzie/docker-app'      # Docker Hub repository
-  containerName: 'sampleapp'           # Name of the Docker container on AWS
-  serverUser: 'ubuntu'                 # SSH username for AWS server
-  serverIp: $(AWS)                     # AWS server IP address
-  privateKey: $(Key)                   # Private key for SSH authentication (stored securely in pipeline variables)
+  imageName: 'mirzzie/docker-app'        # Docker Hub repository
+  containerName: 'sampleapp'             # Name of the Docker container on AWS
+  serverUser: 'ubuntu'                   # SSH username for AWS server
+  pipelineServerIp: $(PipelineServerIp)  # IP of the EC2 instance running the Azure Pipeline Agent
+  dockerServerIp: $(DockerServerIp)      # IP of the EC2 instance where Docker app is running and container will be deployed
+  privateKey: $(Key)                     # Private key for SSH authentication (stored securely in pipeline variables)
 
 stages:
   - stage: Build
@@ -21,7 +22,7 @@ stages:
         steps:
           - task: Docker@2
             inputs:
-              containerRegistry: 'DockerRegistry'   # Reference the service connection by name
+              containerRegistry: 'DockerRegistry'  # Reference the service connection by name
               command: build
               repository: $(imageName)
               Dockerfile: '**/Dockerfile'
@@ -30,33 +31,32 @@ stages:
 
           - task: Docker@2
             inputs:
-              containerRegistry: 'DockerHub'   # Reference the service connection by name
+              containerRegistry: 'DockerHub'  # Reference the service connection by name
               command: push
               repository: $(imageName)
               tags: |
                 $(Build.BuildId)
 
   - stage: Deploy
-    displayName: 'Deploy to AWS Server'
+    displayName: 'Deploy to AWS Docker Application EC2'
     jobs:
-    - job: Deploy
-      steps:
-        - script: |
-            echo "Deploying to AWS Server..."
-            
-            # Create SSH key file
-            echo "$(Key)" > ~/.ssh/aws_key
-            chmod 600 ~/.ssh/aws_key
+      - job: Deploy
+        steps:
+          - script: |
+              echo "Deploying to AWS Docker Application Server..."
+              
+              # Create SSH key file
+              echo "$(privateKey)" > ~/.ssh/aws_key
+              chmod 600 ~/.ssh/aws_key
 
-            # Add the AWS server's host key to known_hosts to avoid SSH verification issues
-            ssh-keyscan -H $(AWS) >> ~/.ssh/known_hosts
+              # Add the Docker server's host key to known_hosts to avoid SSH verification issues
+              ssh-keyscan -H $(dockerServerIp) >> ~/.ssh/known_hosts
 
-            # SSH into the server and pull the latest Docker image, then restart container
-            ssh -i ~/.ssh/aws_key ubuntu@$(AWS) << 'EOF'
-              docker stop $(containerName) || true
-              docker rm $(containerName) || true
-              docker pull $(imageName):$(Build.BuildId)
-              docker run -d --name $(containerName) -p 80:80 $(imageName):$(Build.BuildId)
-            EOF
-          displayName: 'Deploy Docker Container to AWS'
-
+              # SSH into the Docker server and pull the latest Docker image, then restart the container
+              ssh -i ~/.ssh/aws_key $(serverUser)@$(dockerServerIp) << 'EOF'
+                docker stop $(containerName) || true
+                docker rm $(containerName) || true
+                docker pull $(imageName):$(Build.BuildId)
+                docker run -d --name $(containerName) -p 80:80 $(imageName):$(Build.BuildId)
+              EOF
+            displayName: 'Deploy Docker Container to AWS Docker Application EC2'
