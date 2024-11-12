@@ -3,7 +3,7 @@ const app = express();
 const PORT = 80;
 
 app.get("/", (req, res) => {
-  res.send("Hello from DOCKER App!");
+  res.send("TERRAFORM + ANSIIBLE + AWS +AZURE DEVOPS!");
 });
 
 app.listen(PORT, () => {
