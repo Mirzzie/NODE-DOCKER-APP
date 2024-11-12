@@ -12,8 +12,6 @@ variables:
   serverUser: 'ubuntu'                 # SSH username for AWS server
   serverIp: $(AWS)                     # AWS server IP address
   privateKey: $(Key)                   # Private key for SSH authentication (stored securely in pipeline variables)
-  dockerHubUsername: $(dockerHubUsername)  # Docker Hub username
-  dockerHubPAT: $(dockerHubPAT)            # Docker Hub PAT
 
 stages:
   - stage: Build
@@ -21,12 +19,9 @@ stages:
     jobs:
       - job: Build
         steps:
-          - script: |
-              echo $(dockerHubPAT) | docker login -u $(dockerHubUsername) --password-stdin
-            displayName: 'Login to Docker Hub'
-
           - task: Docker@2
             inputs:
+              containerRegistry: 'DockerRegistry'   # Reference the service connection by name
               command: build
               repository: $(imageName)
               Dockerfile: '**/Dockerfile'
@@ -35,6 +30,7 @@ stages:
 
           - task: Docker@2
             inputs:
+              containerRegistry: 'DockerHub'   # Reference the service connection by name
               command: push
               repository: $(imageName)
               tags: |
