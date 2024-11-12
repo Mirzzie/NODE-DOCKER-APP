@@ -46,12 +46,12 @@ stages:
 
              # Configure SSH key for deployment
             mkdir -p ~/key
-            echo "$(privateKey)" > ~/key/key.pem
+            echo "$privateKey" > ~/key/key.pem
             chmod 600 ~/key/key.pem
 
              # Start SSH agent and add the key
-            eval $(ssh-agent -s)
-            ssh-add ~/key/key.pem
+            # eval $(ssh-agent -s)
+            # ssh-add ~/key/key.pem
 
              # Add Docker server's host key to known_hosts
             ssh-keyscan -H "$(DeployServerIP)" >> ~/.ssh/known_hosts
