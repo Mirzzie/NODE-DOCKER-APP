@@ -46,7 +46,7 @@ stages:
 
              # Configure SSH key for deployment
             mkdir -p ~/key
-            echo "$privateKey" > ~/key/key.pem
+            echo "$(privateKey)" > ~/key/key.pem
             chmod 600 ~/key/key.pem
 
              # Start SSH agent and add the key
