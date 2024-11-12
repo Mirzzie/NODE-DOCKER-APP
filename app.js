@@ -3,7 +3,7 @@ const app = express();
 const PORT = 80;
 
 app.get("/", (req, res) => {
-  res.send("TERRAFORM + ANSIIBLE + AWS +AZURE DEVOPS!");
+  res.send("TERRAFORM + ANSIBLE + AWS +AZURE DEVOPS!");
 });
 
 app.listen(PORT, () => {
