@@ -9,7 +9,7 @@ pool:
 variables:
   imageName: 'mirzzie/docker-app'
   containerName: 'sampleapp'
-  DeployUser: $user
+  DeployUser: $(user)
   DeployServerIP: $(ip)
   privateKey: $(key)
 
@@ -21,7 +21,7 @@ stages:
         steps:
           - task: Docker@2
             inputs:
-              containerRegistry: 'DockerRegistry'
+              containerRegistry: 'DockerRegistry'  # Adjust to your Docker registry name
               command: build
               repository: $(imageName)
               Dockerfile: '**/Dockerfile'
@@ -30,7 +30,7 @@ stages:
 
           - task: Docker@2
             inputs:
-              containerRegistry: 'DockerHub'
+              containerRegistry: 'DockerRegistry'  # Adjust to your Docker registry name
               command: push
               repository: $(imageName)
               tags: |
@@ -43,20 +43,21 @@ stages:
         steps:
           - script: |
               echo "Deploying to AWS Docker Application Server..."
-              
+
               # Configure SSH key for deployment
               mkdir -p ~/.ssh
-              echo $(privateKey) > ~/.ssh/id_rsa
+              echo "$(privateKey)" | tr -d '\r' > ~/.ssh/id_rsa
               chmod 600 ~/.ssh/id_rsa
 
               # Add Docker server's host key to known_hosts
               ssh-keyscan -H $(DeployServerIP) >> ~/.ssh/known_hosts
 
               # Deploy Docker container on AWS
-              ssh -i ~/.ssh/id_rsa $(DeployUser)@$(DeployServerIP) << EOF
+              ssh -i ~/.ssh/id_rsa "$(DeployUser)"@"$(DeployServerIP)" << EOF
                 docker stop $(containerName) || true
                 docker rm $(containerName) || true
                 docker pull $(imageName):$(Build.BuildId)
                 docker run -d --name $(containerName) -p 80:80 $(imageName):$(Build.BuildId)
               EOF
             displayName: 'Deploy Docker Container to AWS Docker Application EC2'
+
