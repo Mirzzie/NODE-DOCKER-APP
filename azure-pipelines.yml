@@ -54,7 +54,7 @@ stages:
             ssh-add ~/key/key.pem
 
              # Add Docker server's host key to known_hosts
-            ssh-keyscan -H $(DeployServerIP) >> ~/.ssh/known_hosts
+            ssh-keyscan -H "$(DeployServerIP)" >> ~/.ssh/known_hosts
  
              # Deploy Docker container on AWS
             ssh -i ~/key/key.pem "$(DeployUser)"@"$(DeployServerIP)" << EOF
