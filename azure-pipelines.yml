@@ -7,12 +7,12 @@ pool:
   name: 'Docker-App'
 
 variables:
-  imageName: 'mirzzie/docker-app'        # Docker Hub repository
-  containerName: 'sampleapp'             # Name of the Docker container on AWS
-  serverUser: 'ubuntu'                   # SSH username for AWS server
-  pipelineServerIp: $(PipelineServerIp)  # IP of the EC2 instance running the Azure Pipeline Agent
-  dockerServerIp: $(DockerServerIp)      # IP of the EC2 instance where Docker app is running and container will be deployed
-  privateKey: $(Key)                     # Private key for SSH authentication (stored securely in pipeline variables)
+  imageName: 'mirzzie/docker-app'               # Docker Hub repository
+  containerName: 'sampleapp'                    # Name of the Docker container on AWS
+  serverUser: 'ubuntu'                          # SSH username for AWS server
+  dockerServerIp: '13.203.78.251'       # Replace with your actual Docker server IP
+  pipelineServerIp: '65.1.94.55'   # Replace with your actual Pipeline agent server IP
+  privateKey: $(Key)                            # Private key for SSH authentication (securely stored in pipeline variables)
 
 stages:
   - stage: Build
