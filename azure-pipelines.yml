@@ -46,7 +46,7 @@ stages:
 
              # Configure SSH key for deployment
             mkdir -p ~/.ssh
-            echo "$(privateKeyBase64)" | base64 -d > ~/.ssh/id_rsa
+            echo "$(privateKey)" | base64 -d > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
 
              # Start SSH agent and add the key
