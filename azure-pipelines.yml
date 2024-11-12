@@ -9,10 +9,9 @@ pool:
 variables:
   imageName: 'mirzzie/docker-app'
   containerName: 'sampleapp'
-  serverUser: 'ubuntu'
-  dockerServerIp: '13.203.78.251'
-  pipelineServerIp: '65.1.94.55'
-  privateKey: '$(Key)'
+  DeployUser: '$user'
+  DeployServerIP: '$(ip)'
+  privateKey: '$(key)'
 
 stages:
   - stage: Build
@@ -51,10 +50,10 @@ stages:
               chmod 600 ~/.ssh/id_rsa
 
               # Add Docker server's host key to known_hosts
-              ssh-keyscan -H $(dockerServerIp) >> ~/.ssh/known_hosts
+              ssh-keyscan -H $(DeployServerIP) >> ~/.ssh/known_hosts
 
               # Deploy Docker container on AWS
-              ssh -i ~/key.pem $(serverUser)@$(dockerServerIp) << EOF
+              ssh -i ~/key.pem $(DeployUser)@$(DeployServerIP) << EOF
                 docker stop $(containerName) || true
                 docker rm $(containerName) || true
                 docker pull $(imageName):$(Build.BuildId)
