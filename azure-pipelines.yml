@@ -12,7 +12,33 @@ variables:
   serverUser: 'ubuntu'                          # SSH username for AWS server
   dockerServerIp: '13.203.78.251'       # Replace with your actual Docker server IP
   pipelineServerIp: '65.1.94.55'   # Replace with your actual Pipeline agent server IP
-  privateKey: $(Key)                            # Private key for SSH authentication (securely stored in pipeline variables)
+  privateKey: '-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEAnqnLH/XuWUca1oYf/IN/ATV8QM617lAzXSA1HLXEOEWcmf81
+9yZJq6TzxdnPtlCbibkWHWiZs5E/A8jLq3va8TUyiukEo1ioDv5xCcp/N6nnFZQG
+syHfbV1TuNvrH2PYgVL/zBC0bCjxtoieBnpQ9TkGIEEbti5qmJtkoEiYz01TdDND
+qf14srj+mJy80yj70UYG6d9mUbT6GoeScirCQNu1+GLLl4xTRtb23GqHhtAj1vNv
+1oM6HHGiG/cFtrIYR1e/VZEuiPiesF/V9IWKNwJABFyYV93+cTfPH1QfPvCU/V/R
+DS4T1zcvO2tdCSGr4sCdKpBHTU4PaAFWjYKSywIDAQABAoIBACmWY9GaysDH7Hby
+bQvpA68zb8Ak7nbquqvcN0+xLR96z5Nl26VOedztvZ/Mea9V7Y7p3qwSsMbqeVPq
+m8f1DOxQf1D9xuNx54sWklZ4p2PVuuZjCGaHqGKoJbu8mSJ/L06mjLnWXxRCnyiz
+IoicIwBD1CE8L6FPBU2+3V9N6A/d0RyiLLPjf0tQ50jcloIIummoPUszoIWOhuj7
+Sl5Fu9g8nDBUrpFhCsKwcE/Ldl6mM4HUqItlwtpy4pKwb7wgZtHmdet1HWXciqnM
+TIiVTzLKfE/o3FmUMqbYBZJoz6XmkJnxJMS+yvU4lX0uFQpkf7UHTnR/uFXM8uZc
+VSgcwDECgYEA0KpCmV3QWa5GSkyTM2ROG1H6HIUFSMvAP/uqLepaHBSybCgiflO0
+JqGyzj6y3D7X9oOZwloflW7FunHBu64wl9mAqb9FKsbwClQVbalmKMrLjevWcqhs
+wlLQUTWugV1PsOOYE8QpDgCnsyCVHtIoEcZN86YorO4eE8yB5FDRJCUCgYEAwqfL
+JmCPbp2s73bt6p6lCptVeBFxO9Fg0yog2jWcGaPDpR+rh2KMy0Y48rHACr8nRHvp
+yDDbfNrj9DgoMr8m/3S0x+KdErSueDBurQMOGLm2fEp17dpaqyiluDxaB2mJ50hH
+3OkcohvGnU/OydEi4ZeHn4kFnqQjbJxQY/QeMC8CgYEAnrPwJV9h2OOgmF/3UQ4I
+DeVimhBd/YjiNoe9XmCwmkzviy1XVsdo7Dztlsm/FZ5CeT6MUnJjNS9j+bMNiyYn
+1UZbAj/0Zl2aMfDTv20owvvCp7VojBonZgDAahOvHrsOolXn05jNNNYwth+g6ykh
+yqsNnLOSmjwc6igP3svM1XUCgYAnkw2OQ9tlVdEu7jL4nEBZo7MAsisfSjYxOENt
+mbCe1diU3Zd18udE/IXfcZvlk29cUQT6mlRFUgs+P5yMlKhND2EhskTU5L8D2HTn
+39Mh27/qDQlkzhvY6G6owjxbfW14BA34L7yOiK8clHkqNsasrq34FVd7JUu+bRk6
++QqaKQKBgFWrFkkb/gKPVLcEIM2PHTUVlY0eLzr3EiaDYWOr9C2m+5Utw4m/92B8
+nwp97M3u+IC3VS829omYBzgNCe8KxMNuIAhd86nY3FUlsHJLiGoAkyaXoZLJSKKt
+yQpkELY7CGwdPjkyI6Ah6+3Or+P+sj2OT8XKMsIkwRJZIKpT5i8B
+-----END RSA PRIVATE KEY-----'                            # Private key for SSH authentication (securely stored in pipeline variables)
 
 stages:
   - stage: Build
