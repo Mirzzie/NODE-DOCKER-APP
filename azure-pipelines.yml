@@ -9,9 +9,9 @@ pool:
 variables:
   imageName: 'mirzzie/docker-app'
   containerName: 'sampleapp'
-  DeployUser: '$user'
-  DeployServerIP: '$(ip)'
-  privateKey: '$(key)'
+  DeployUser: $user
+  DeployServerIP: $(ip)
+  privateKey: $(key)
 
 stages:
   - stage: Build
