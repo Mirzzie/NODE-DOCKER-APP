@@ -39,19 +39,24 @@ stages:
   - stage: Deploy
     displayName: 'Deploy to AWS Server'
     jobs:
-      - job: Deploy
-        steps:
-          - script: |
-              echo "Deploying to AWS Server..."
-              # Create SSH key file
-              echo "$(privateKey)" > ~/.ssh/aws_key
-              chmod 600 ~/.ssh/aws_key
+    - job: Deploy
+      steps:
+        - script: |
+            echo "Deploying to AWS Server..."
+            
+            # Create SSH key file
+            echo "$(Key)" > ~/.ssh/aws_key
+            chmod 600 ~/.ssh/aws_key
 
-              # SSH into the server and pull the latest Docker image, then restart container
-              ssh -i ~/.ssh/aws_key $(serverUser)@$(serverIp) << 'EOF'
-                docker stop $(containerName) || true
-                docker rm $(containerName) || true
-                docker pull $(imageName):$(Build.BuildId)
-                docker run -d --name $(containerName) -p 80:80 $(imageName):$(Build.BuildId)
-              EOF
-            displayName: 'Deploy Docker Container to AWS'
+            # Add the AWS server's host key to known_hosts to avoid SSH verification issues
+            ssh-keyscan -H $(AWS) >> ~/.ssh/known_hosts
+
+            # SSH into the server and pull the latest Docker image, then restart container
+            ssh -i ~/.ssh/aws_key ubuntu@$(AWS) << 'EOF'
+              docker stop $(containerName) || true
+              docker rm $(containerName) || true
+              docker pull $(imageName):$(Build.BuildId)
+              docker run -d --name $(containerName) -p 80:80 $(imageName):$(Build.BuildId)
+            EOF
+          displayName: 'Deploy Docker Container to AWS'
+
