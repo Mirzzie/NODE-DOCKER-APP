@@ -54,7 +54,7 @@ stages:
               ssh-keyscan -H $(dockerServerIp) >> ~/.ssh/known_hosts
 
               # Deploy Docker container on AWS
-              ssh -i ~/Key.pem $(serverUser)@$(dockerServerIp) << EOF
+              ssh -i ~/key.pem $(serverUser)@$(dockerServerIp) << EOF
                 docker stop $(containerName) || true
                 docker rm $(containerName) || true
                 docker pull $(imageName):$(Build.BuildId)
