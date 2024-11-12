@@ -7,12 +7,12 @@ pool:
   name: 'Docker-App'
 
 variables:
-  imageName: 'mirzzie/docker-app'               # Docker Hub repository
-  containerName: 'sampleapp'                    # Name of the Docker container on AWS
-  serverUser: 'ubuntu'                          # SSH username for AWS server
-  dockerServerIp: '13.203.78.251'               # Replace with your actual Docker server IP
-  pipelineServerIp: '65.1.94.55'                # Replace with your actual Pipeline agent server IP
-  privateKey: '$(Key)'                          # Private key for SSH authentication (securely stored in pipeline variables)
+  imageName: 'mirzzie/docker-app'
+  containerName: 'sampleapp'
+  serverUser: 'ubuntu'
+  dockerServerIp: '13.203.78.251'
+  pipelineServerIp: '65.1.94.55'
+  privateKey: '$(Key)'
 
 stages:
   - stage: Build
@@ -22,7 +22,7 @@ stages:
         steps:
           - task: Docker@2
             inputs:
-              containerRegistry: 'DockerRegistry'  # Reference the service connection by name
+              containerRegistry: 'DockerRegistry'
               command: build
               repository: $(imageName)
               Dockerfile: '**/Dockerfile'
@@ -31,7 +31,7 @@ stages:
 
           - task: Docker@2
             inputs:
-              containerRegistry: 'DockerHub'  # Reference the service connection by name
+              containerRegistry: 'DockerHub'
               command: push
               repository: $(imageName)
               tags: |
@@ -45,15 +45,15 @@ stages:
           - script: |
               echo "Deploying to AWS Docker Application Server..."
               
-              # Ensure the private key is saved with correct permissions and format
+              # Save private key with correct permissions
               echo -e "${privateKey//\\n/$'\n'}" > ~/.ssh/aws_key
               chmod 600 ~/.ssh/aws_key
 
-              # Add the Docker server's host key to known_hosts to avoid SSH verification issues
+              # Corrected ssh-keyscan syntax
               ssh-keyscan -H $dockerServerIp >> ~/.ssh/known_hosts
 
-              # SSH into the Docker server and deploy the Docker container
-              ssh -i ~/.ssh/aws_key $serverUser@$dockerServerIp << 'EOF'
+              # Deploying Docker container on AWS
+              ssh -i ~/.ssh/aws_key $serverUser@$dockerServerIp << EOF
                 docker stop $containerName || true
                 docker rm $containerName || true
                 docker pull $imageName:$Build_BuildId
